@@ -1,0 +1,111 @@
+<div class="container">
+
+    <h1 class ="center-align">Pizza!</h1>
+
+    <div class="row">
+
+        <div class="col s6">
+
+            <h3>Pizza Choices</h3>
+
+            <ul>
+                {{#each pizza}}
+                {{#unless devoured}}
+                <li>
+                    <p>
+                        {{this.pizza_name}}
+                        <button data-id={{this.id}} class="devourplan btn-small">Eat Pizza!</button>
+                    </p>
+                </li>
+                {{/unless}}
+                {{/each}}
+            </ul>
+
+        </div>
+
+        <div class="col s6">
+
+            <h3>Already Eaten</h3>
+
+            <ul>
+                {{#each pizza}}
+                {{#if devoured}}
+                <li>
+                    <p>
+                        {{this.pizza_name}}
+                    </p>
+                </li>
+                {{/if}}
+                {{/each}}
+            </ul>
+
+        </div>
+
+    </div>
+
+    <h2>Prepare More Pizza</h2>
+    <form class="create-form">
+
+        <div class="form-group">
+        <label for="pizzaName">Pizza Name:</label>
+        <input type="text" id="pizzaName" name="name">
+        </div>
+
+        <button type="submit" class="btn-large">Add Pizza</button>
+
+    </form>
+
+</div>
+
+<script>
+    $(function() {
+    $(".devourplan").on("click", function(event) {
+
+        event.preventDefault();
+
+        var id = $(this).data("id");
+        var newDevoured = true;
+
+        console.log(id);
+
+        var newDevouredState = {
+        devoured: newDevoured
+        };
+
+        console.log(newDevouredState)
+
+        // Send the PUT request.
+        $.ajax("/api/pizza/" + id, {
+        type: "PUT",
+        data: newDevouredState
+        }).then(
+        function() {
+            console.log("changed sleep to", newDevoured);
+            // Reload the page to get the updated list
+            location.reload();
+        }
+        );
+    });
+
+    $(".create-form").on("submit", function(event) {
+        // Make sure to preventDefault on a submit event.
+        event.preventDefault();
+
+        var newPizza = {
+            pizza_name: $("#pizzaName").val().trim(),
+        };
+
+        // Send the POST request.
+        $.ajax("/api/pizza", {
+        type: "POST",
+        data: newPizza
+        }).then(
+        function() {
+            console.log("created new pizza");
+            // Reload the page to get the updated list
+            location.reload();
+        }
+        );
+    });
+});
+</script>
